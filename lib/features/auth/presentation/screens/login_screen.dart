@@ -7,6 +7,7 @@ import 'package:task_ai/core/widgets/custom_input_field.dart';
 import 'package:task_ai/core/widgets/custom_snackbar.dart';
 import 'package:task_ai/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:task_ai/features/auth/presentation/cubit/auth_state.dart';
+import 'package:task_ai/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:task_ai/features/auth/presentation/screens/signup_screen.dart';
 import 'package:task_ai/features/auth/presentation/widgets/auth_divider.dart';
 import 'package:task_ai/features/auth/presentation/widgets/auth_field_label.dart';
@@ -101,7 +102,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     const AuthFieldLabel(text: 'PASSWORD'),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ForgotPasswordScreen(),
+                          ),
+                        );
+                      },
                       style: TextButton.styleFrom(padding: EdgeInsets.zero),
                       child: Text(
                         'Forgot Password?',
