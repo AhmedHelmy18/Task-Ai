@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "831069810194",
+    "project_id": "task-ai-69bdc",
+    "storage_bucket": "task-ai-69bdc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:831069810194:android:56ff1a0717cf1f5cac32cb",
+        "android_client_info": {
+          "package_name": "com.example.task_ai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "831069810194-k9c1udsindb2buqmjvdbbbojprdlad4d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1qMSEB5RIkgni8lnKm1NcxmMnp0Vahb8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "831069810194-k9c1udsindb2buqmjvdbbbojprdlad4d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
