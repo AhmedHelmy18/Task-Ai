@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -5,10 +6,15 @@ import 'package:google_sign_in/google_sign_in.dart';
 class AuthRepository {
   final FirebaseAuth _firebaseAuth;
   final FirebaseFunctions _functions;
+  final FirebaseFirestore _firestore;
 
-  AuthRepository({FirebaseAuth? firebaseAuth, FirebaseFunctions? functions})
-    : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-      _functions = functions ?? FirebaseFunctions.instance {
+  AuthRepository({
+    FirebaseAuth? firebaseAuth,
+    FirebaseFunctions? functions,
+    FirebaseFirestore? firestore,
+  }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+       _functions = functions ?? FirebaseFunctions.instance,
+       _firestore = firestore ?? FirebaseFirestore.instance {
     _initGoogleSignIn();
   }
 
@@ -18,16 +24,30 @@ class AuthRepository {
 
   Stream<User?> get user => _firebaseAuth.authStateChanges();
 
+  Future<void> sendEmailVerification() async {
+    await _firebaseAuth.currentUser?.sendEmailVerification();
+  }
+
+  Future<void> reloadUser() async {
+    await _firebaseAuth.currentUser?.reload();
+  }
+
+  Future<bool> isProfileCreated(String uid) async {
+    try {
+      final doc = await _firestore.collection('users').doc(uid).get();
+      return doc.exists;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<UserCredential> signInWithGoogle() async {
     try {
-      // 1. Authenticate to get identity (ID Token)
       final GoogleSignInAccount googleUser = await GoogleSignIn.instance
           .authenticate();
 
-      // 2. Get Authentication tokens
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
 
-      // 3. Authorize to get Access Token
       final GoogleSignInClientAuthorization authz = await googleUser
           .authorizationClient
           .authorizeScopes(['email', 'profile', 'openid']);

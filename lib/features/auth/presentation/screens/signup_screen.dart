@@ -124,7 +124,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   listener: (context, state) {
                     if (state is AuthError) {
                       CustomSnackBar.showError(context, state.message);
-                    } else if (state is AuthAuthenticated) {
+                    } else if (state is AuthAuthenticated ||
+                        state is AuthNeedsVerification) {
                       Navigator.of(context).popUntil((route) => route.isFirst);
                     }
                   },

@@ -8,6 +8,7 @@ import 'auth_state.dart';
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepository _authRepository;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  bool _isSigningUp = false;
 
   AuthCubit(this._authRepository) : super(AuthInitial());
 
@@ -33,7 +34,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       await _authRepository.signIn(email: email, password: password);
-      await _requestNotificationPermissions();
+      await _handleAuthStateSync();
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -46,15 +47,17 @@ class AuthCubit extends Cubit<AuthState> {
       final user = userCredential.user;
 
       if (user != null) {
-        final isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
-        if (isNewUser) {
+        final isProfileCreated = await _authRepository.isProfileCreated(
+          user.uid,
+        );
+        if (!isProfileCreated) {
           await _authRepository.createUserProfile(
             name: user.displayName ?? 'No Name',
             email: user.email ?? 'No Email',
             uid: user.uid,
           );
         }
-        await _requestNotificationPermissions();
+        await _handleAuthStateSync();
       }
     } catch (e) {
       emit(AuthError(e.toString()));
@@ -63,24 +66,82 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> signUp(String name, String email, String password) async {
     emit(AuthLoading());
+    _isSigningUp = true;
     try {
       await _authRepository.signUp(
         name: name,
         email: email,
         password: password,
       );
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        await _authRepository.createUserProfile(
-          name: name,
-          email: email,
-          uid: user.uid,
-        );
-      }
-      await _requestNotificationPermissions();
+      await _authRepository.sendEmailVerification();
+      emit(AuthNeedsVerification());
+    } catch (e) {
+      _isSigningUp = false;
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  Future<void> resendVerificationEmail() async {
+    try {
+      await _authRepository.sendEmailVerification();
     } catch (e) {
       emit(AuthError(e.toString()));
     }
+  }
+
+  Future<void> checkEmailVerification() async {
+    emit(AuthLoading());
+    try {
+      await _authRepository.reloadUser();
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null && user.emailVerified) {
+        _isSigningUp = false;
+        await _handleAuthStateSync();
+      } else {
+        emit(
+          const AuthError(
+            'Email not verified. Please check your inbox and click the verification link.',
+          ),
+        );
+        emit(AuthNeedsVerification());
+      }
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  Future<void> _handleAuthStateSync() async {
+    emit(AuthLoading());
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      _isSigningUp = false;
+      emit(AuthUnauthenticated());
+      return;
+    }
+
+    if (_isSigningUp) {
+      if (!user.emailVerified) {
+        emit(AuthNeedsVerification());
+        return;
+      } else {
+        _isSigningUp = false;
+      }
+    }
+
+    final isProfileCreated = await _authRepository.isProfileCreated(user.uid);
+    if (isProfileCreated) {
+      await _requestNotificationPermissions();
+      emit(AuthAuthenticated(user));
+      return;
+    }
+
+    await _authRepository.createUserProfile(
+      name: user.displayName ?? 'No Name',
+      email: user.email ?? 'No Email',
+      uid: user.uid,
+    );
+    await _requestNotificationPermissions();
+    emit(AuthAuthenticated(user));
   }
 
   Future<void> signOut() async {
@@ -99,10 +160,9 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   void checkAuthStatus() {
-    _authRepository.user.listen((user) {
+    _authRepository.user.listen((user) async {
       if (user != null) {
-        emit(AuthAuthenticated(user));
-        _requestNotificationPermissions();
+        await _handleAuthStateSync();
       } else {
         emit(AuthUnauthenticated());
       }

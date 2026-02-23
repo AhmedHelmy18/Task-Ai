@@ -101,8 +101,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const AuthFieldLabel(text: 'PASSWORD'),
-                    TextButton(
-                      onPressed: () {
+                    GestureDetector(
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -110,7 +110,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         );
                       },
-                      style: TextButton.styleFrom(padding: EdgeInsets.zero),
                       child: Text(
                         'Forgot Password?',
                         style: GoogleFonts.inter(
@@ -122,6 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
                 CustomTextFormField(
                   hintText: '••••••••',
                   validator: AuthValidator.passwordValidator,
@@ -134,7 +134,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   listener: (context, state) {
                     if (state is AuthError) {
                       CustomSnackBar.showError(context, state.message);
-                    } else if (state is AuthAuthenticated) {
+                    } else if (state is AuthAuthenticated ||
+                        state is AuthNeedsVerification) {
                       Navigator.of(context).popUntil((route) => route.isFirst);
                     }
                   },
