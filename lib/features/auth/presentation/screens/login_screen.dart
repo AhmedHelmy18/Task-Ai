@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:task_ai/core/utils/auth_validator.dart';
 import 'package:task_ai/core/widgets/custom_input_field.dart';
+import 'package:task_ai/core/widgets/custom_snackbar.dart';
+import 'package:task_ai/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:task_ai/features/auth/presentation/cubit/auth_state.dart';
 import 'package:task_ai/features/auth/presentation/screens/signup_screen.dart';
+import 'package:task_ai/features/auth/presentation/widgets/auth_divider.dart';
+import 'package:task_ai/features/auth/presentation/widgets/auth_field_label.dart';
+import 'package:task_ai/features/auth/presentation/widgets/social_login_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -25,9 +31,12 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _onSignIn() {
+  void _onSignIn(BuildContext context) {
     if (_formKey.currentState!.validate()) {
-      // Handle sign in logic
+      context.read<AuthCubit>().signIn(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
     }
   }
 
@@ -78,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 48),
-                _buildLabel('EMAIL', colorScheme),
+                const AuthFieldLabel(text: 'EMAIL'),
                 const SizedBox(height: 8),
                 CustomTextFormField(
                   hintText: 'name@example.com',
@@ -90,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildLabel('PASSWORD', colorScheme),
+                    const AuthFieldLabel(text: 'PASSWORD'),
                     TextButton(
                       onPressed: () {},
                       style: TextButton.styleFrom(padding: EdgeInsets.zero),
@@ -113,63 +122,61 @@ class _LoginScreenState extends State<LoginScreen> {
                   isPasswordField: true,
                 ),
                 const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: _onSignIn,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Sign In',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                BlocConsumer<AuthCubit, AuthState>(
+                  listener: (context, state) {
+                    if (state is AuthError) {
+                      CustomSnackBar.showError(context, state.message);
+                    } else if (state is AuthAuthenticated) {
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    }
+                  },
+                  builder: (context, state) {
+                    return SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: state is AuthLoading
+                            ? null
+                            : () => _onSignIn(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
+                          elevation: 0,
                         ),
-                        SizedBox(width: 8),
-                        Icon(LucideIcons.arrow_right, size: 18),
-                      ],
-                    ),
-                  ),
+                        child: state is AuthLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Sign In',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Icon(LucideIcons.arrow_right, size: 18),
+                                ],
+                              ),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 32),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Divider(
-                        color: colorScheme.onSecondary.withAlpha(30),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        'OR CONTINUE WITH',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: colorScheme.onSecondary.withAlpha(100),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Divider(
-                        color: colorScheme.onSecondary.withAlpha(30),
-                      ),
-                    ),
-                  ],
-                ),
+                const AuthDivider(text: 'OR CONTINUE WITH'),
                 const SizedBox(height: 32),
-                _buildSocialButton('Google', colorScheme),
+                SocialLoginButton(label: 'Google', onPressed: () {}),
                 const SizedBox(height: 32),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -201,57 +208,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSocialButton(String label, ColorScheme colorScheme) {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: OutlinedButton(
-        onPressed: () {},
-        style: OutlinedButton.styleFrom(
-          backgroundColor: Colors.white.withAlpha(5),
-          side: BorderSide(color: Colors.white.withAlpha(10)),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              'assets/images/google_icon.svg',
-              height: 24,
-              width: 24,
-            ),
-            const SizedBox(width: 12),
-            Text(
-              label,
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLabel(String text, ColorScheme colorScheme) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        text,
-        style: GoogleFonts.inter(
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-          color: colorScheme.onSecondary.withAlpha(150),
-          letterSpacing: 1.1,
         ),
       ),
     );

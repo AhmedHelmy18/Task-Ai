@@ -20,6 +20,8 @@ dependencies:
   google_fonts: ^8.0.2
   flutter_svg: ^2.2.3
   flutter_lucide: ^1.8.2
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.8
 
 dev_dependencies:
   flutter_test:

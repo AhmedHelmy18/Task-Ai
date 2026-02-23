@@ -112,8 +112,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       children: [
                         const Spacer(),
                         Container(
-                          width: 280,
-                          height: 280,
+                          width: 380,
+                          height: 340,
                           decoration: BoxDecoration(
                             color: Colors.white.withAlpha(5),
                             borderRadius: BorderRadius.circular(24),

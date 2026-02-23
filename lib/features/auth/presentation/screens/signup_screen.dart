@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:task_ai/core/utils/auth_validator.dart';
 import 'package:task_ai/core/widgets/custom_input_field.dart';
+import 'package:task_ai/core/widgets/custom_snackbar.dart';
+import 'package:task_ai/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:task_ai/features/auth/presentation/cubit/auth_state.dart';
+import 'package:task_ai/features/auth/presentation/widgets/auth_divider.dart';
+import 'package:task_ai/features/auth/presentation/widgets/auth_field_label.dart';
+import 'package:task_ai/features/auth/presentation/widgets/social_login_button.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -26,9 +32,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
-  void _onCreateAccount() {
+  void _onCreateAccount(BuildContext context) {
     if (_formKey.currentState!.validate()) {
-      // Handle account creation logic
+      context.read<AuthCubit>().signUp(
+        _nameController.text.trim(),
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
     }
   }
 
@@ -81,7 +91,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 const SizedBox(height: 40),
-                _buildLabel('Full Name', colorScheme),
+                const AuthFieldLabel(text: 'Full Name'),
                 const SizedBox(height: 8),
                 CustomTextFormField(
                   hintText: 'John Doe',
@@ -91,7 +101,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   keyboardType: TextInputType.name,
                 ),
                 const SizedBox(height: 24),
-                _buildLabel('Email Address', colorScheme),
+                const AuthFieldLabel(text: 'Email Address'),
                 const SizedBox(height: 8),
                 CustomTextFormField(
                   hintText: 'name@example.com',
@@ -100,7 +110,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   textInputAction: TextInputAction.next,
                 ),
                 const SizedBox(height: 24),
-                _buildLabel('Password', colorScheme),
+                const AuthFieldLabel(text: 'Password'),
                 const SizedBox(height: 8),
                 CustomTextFormField(
                   hintText: 'min. 8 characters',
@@ -110,39 +120,61 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   isPasswordField: true,
                 ),
                 const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: _onCreateAccount,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Create Account',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                BlocConsumer<AuthCubit, AuthState>(
+                  listener: (context, state) {
+                    if (state is AuthError) {
+                      CustomSnackBar.showError(context, state.message);
+                    } else if (state is AuthAuthenticated) {
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    }
+                  },
+                  builder: (context, state) {
+                    return SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: state is AuthLoading
+                            ? null
+                            : () => _onCreateAccount(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
+                          elevation: 0,
                         ),
-                        SizedBox(width: 8),
-                        Icon(LucideIcons.arrow_right, size: 18),
-                      ],
-                    ),
-                  ),
+                        child: state is AuthLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Create Account',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Icon(LucideIcons.arrow_right, size: 18),
+                                ],
+                              ),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 32),
-                _buildDivider('Or sign up with', colorScheme),
+                const AuthDivider(text: 'Or sign up with'),
                 const SizedBox(height: 32),
-                _buildSocialButton('Google', colorScheme),
+                SocialLoginButton(label: 'Google', onPressed: () {}),
                 const SizedBox(height: 32),
                 _buildTermsText(colorScheme),
                 const SizedBox(height: 24),
@@ -171,76 +203,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLabel(String text, ColorScheme colorScheme) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        text,
-        style: GoogleFonts.inter(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          color: Colors.white.withAlpha(200),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDivider(String text, ColorScheme colorScheme) {
-    return Row(
-      children: [
-        Expanded(child: Divider(color: colorScheme.onSecondary.withAlpha(30))),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            text,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: colorScheme.onSecondary.withAlpha(100),
-            ),
-          ),
-        ),
-        Expanded(child: Divider(color: colorScheme.onSecondary.withAlpha(30))),
-      ],
-    );
-  }
-
-  Widget _buildSocialButton(String label, ColorScheme colorScheme) {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: OutlinedButton(
-        onPressed: () {},
-        style: OutlinedButton.styleFrom(
-          backgroundColor: Colors.white.withAlpha(5),
-          side: BorderSide(color: Colors.white.withAlpha(10)),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              'assets/images/google_icon.svg',
-              height: 24,
-              width: 24,
-            ),
-            const SizedBox(width: 12),
-            Text(
-              label,
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          ],
         ),
       ),
     );

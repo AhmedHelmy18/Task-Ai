@@ -8,25 +8,54 @@
  */
 
 const {setGlobalOptions} = require("firebase-functions");
-const {onRequest} = require("firebase-functions/https");
+const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const {getFirestore, FieldValue} = require("firebase-admin/firestore");
+const {initializeApp} = require("firebase-admin/app");
 const logger = require("firebase-functions/logger");
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
+initializeApp();
+const db = getFirestore();
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+setGlobalOptions({maxInstances: 10});
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+exports.createUserProfile = onCall(async (request) => {
+  // Ensure user is authenticated
+  if (!request.auth) {
+    throw new HttpsError(
+        "unauthenticated",
+        "The function must be called while authenticated.",
+    );
+  }
+
+  const {name, email, uid} = request.data;
+
+  // Validate input
+  if (!name || !email || !uid) {
+    throw new HttpsError(
+        "invalid-argument",
+        "The function must be called with name, email, and uid.",
+    );
+  }
+
+  try {
+    await db.collection("users").doc(uid).set({
+      userData: {
+        name: name,
+        email: email,
+      },
+      uid: uid,
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+
+    logger.info(`User profile created for UID: ${uid}`);
+    return {success: true, message: "User profile created successfully"};
+  } catch (error) {
+    logger.error("Error creating user profile:", error);
+    throw new HttpsError(
+        "internal",
+        "Error creating user profile in Firestore",
+    );
+  }
+});
+

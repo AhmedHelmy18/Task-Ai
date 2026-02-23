@@ -4,7 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_ai/app/app.dart';
+import 'package:task_ai/features/auth/data/repositories/auth_repository.dart';
+import 'package:task_ai/features/auth/presentation/cubit/auth_cubit.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -17,8 +20,25 @@ void main() async {
   if (kDebugMode) {
     await FirebaseAuth.instance.useAuthEmulator("10.0.2.2", 9099);
     FirebaseFirestore.instance.useFirestoreEmulator("10.0.2.2", 8080);
-    FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: false);
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: false,
+    );
     FirebaseFunctions.instance.useFunctionsEmulator("10.0.2.2", 5001);
   }
-  runApp(const TaskAi());
+
+  final authRepository = AuthRepository();
+
+  runApp(
+    MultiRepositoryProvider(
+      providers: [RepositoryProvider.value(value: authRepository)],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => AuthCubit(authRepository)..checkAuthStatus(),
+          ),
+        ],
+        child: const TaskAi(),
+      ),
+    ),
+  );
 }
