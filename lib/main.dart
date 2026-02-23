@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:task_ai/app.dart';
+import 'package:task_ai/app/app.dart';
 import 'firebase_options.dart';
 
 void main() async {
