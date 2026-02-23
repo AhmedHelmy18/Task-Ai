@@ -39,6 +39,28 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  Future<void> signInWithGoogle() async {
+    emit(AuthLoading());
+    try {
+      final userCredential = await _authRepository.signInWithGoogle();
+      final user = userCredential.user;
+
+      if (user != null) {
+        final isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
+        if (isNewUser) {
+          await _authRepository.createUserProfile(
+            name: user.displayName ?? 'No Name',
+            email: user.email ?? 'No Email',
+            uid: user.uid,
+          );
+        }
+        await _requestNotificationPermissions();
+      }
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
   Future<void> signUp(String name, String email, String password) async {
     emit(AuthLoading());
     try {

@@ -1,5 +1,6 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthRepository {
   final FirebaseAuth _firebaseAuth;
@@ -7,9 +8,42 @@ class AuthRepository {
 
   AuthRepository({FirebaseAuth? firebaseAuth, FirebaseFunctions? functions})
     : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-      _functions = functions ?? FirebaseFunctions.instance;
+      _functions = functions ?? FirebaseFunctions.instance {
+    _initGoogleSignIn();
+  }
+
+  void _initGoogleSignIn() async {
+    await GoogleSignIn.instance.initialize();
+  }
 
   Stream<User?> get user => _firebaseAuth.authStateChanges();
+
+  Future<UserCredential> signInWithGoogle() async {
+    try {
+      // 1. Authenticate to get identity (ID Token)
+      final GoogleSignInAccount googleUser = await GoogleSignIn.instance
+          .authenticate();
+
+      // 2. Get Authentication tokens
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+
+      // 3. Authorize to get Access Token
+      final GoogleSignInClientAuthorization authz = await googleUser
+          .authorizationClient
+          .authorizeScopes(['email', 'profile', 'openid']);
+
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: authz.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      return await _firebaseAuth.signInWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    } catch (e) {
+      throw e.toString();
+    }
+  }
 
   Future<void> signUp({
     required String name,

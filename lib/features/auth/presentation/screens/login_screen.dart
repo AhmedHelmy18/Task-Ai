@@ -184,7 +184,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 32),
                 const AuthDivider(text: 'OR CONTINUE WITH'),
                 const SizedBox(height: 32),
-                SocialLoginButton(label: 'Google', onPressed: () {}),
+                SocialLoginButton(
+                  label: 'Google',
+                  onPressed: () => context.read<AuthCubit>().signInWithGoogle(),
+                ),
                 const SizedBox(height: 32),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

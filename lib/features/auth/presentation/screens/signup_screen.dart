@@ -174,7 +174,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: 32),
                 const AuthDivider(text: 'Or sign up with'),
                 const SizedBox(height: 32),
-                SocialLoginButton(label: 'Google', onPressed: () {}),
+                SocialLoginButton(
+                  label: 'Google',
+                  onPressed: () => context.read<AuthCubit>().signInWithGoogle(),
+                ),
                 const SizedBox(height: 32),
                 _buildTermsText(colorScheme),
                 const SizedBox(height: 24),
