@@ -18,12 +18,16 @@ void main() async {
   );
 
   if (kDebugMode) {
-    await FirebaseAuth.instance.useAuthEmulator("10.0.2.2", 9099);
-    FirebaseFirestore.instance.useFirestoreEmulator("10.0.2.2", 8080);
+    final String host =
+        kIsWeb || defaultTargetPlatform != TargetPlatform.android
+        ? 'localhost'
+        : '10.0.2.2';
+    await FirebaseAuth.instance.useAuthEmulator(host, 9099);
+    FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
     FirebaseFirestore.instance.settings = const Settings(
       persistenceEnabled: false,
     );
-    FirebaseFunctions.instance.useFunctionsEmulator("10.0.2.2", 5001);
+    FirebaseFunctions.instance.useFunctionsEmulator(host, 5001);
   }
 
   final authRepository = AuthRepository();

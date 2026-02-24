@@ -1,9 +1,77 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:task_ai/core/widgets/custom_snackbar.dart';
+import 'package:task_ai/features/ai_chat/presentation/widgets/chat_widgets.dart';
 
-class AIChatView extends StatelessWidget {
+class AIChatView extends StatefulWidget {
   const AIChatView({super.key});
+
+  @override
+  State<AIChatView> createState() => _AIChatViewState();
+}
+
+class _AIChatViewState extends State<AIChatView> {
+  final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  bool _isLoading = false;
+
+  String get _uid => FirebaseAuth.instance.currentUser?.uid ?? '';
+
+  CollectionReference get _chatCollection => FirebaseFirestore.instance
+      .collection('users')
+      .doc(_uid)
+      .collection('ai_chat_messages');
+
+  Future<void> _sendMessage() async {
+    final text = _controller.text.trim();
+    if (text.isEmpty || _uid.isEmpty) return;
+
+    _controller.clear();
+    setState(() => _isLoading = true);
+
+    try {
+      await _chatCollection.add({
+        "role": "user",
+        "text": text,
+        "createdAt": FieldValue.serverTimestamp(),
+      });
+
+      final historySnapshot = await _chatCollection
+          .orderBy('createdAt', descending: true)
+          .limit(10)
+          .get();
+
+      final history = historySnapshot.docs.reversed.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return {
+          "role": data["role"] == "user" ? "user" : "model",
+          "parts": [
+            {"text": data["text"]},
+          ],
+        };
+      }).toList();
+
+      final result = await FirebaseFunctions.instance
+          .httpsCallable('chatWithAI')
+          .call({"prompt": text, "history": history});
+
+      await _chatCollection.add({
+        "role": "model",
+        "text": result.data['text'],
+        "createdAt": FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      if (mounted) {
+        CustomSnackBar.showError(context, "Failed to send message");
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,158 +80,15 @@ class AIChatView extends StatelessWidget {
 
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: colorScheme.primary.withAlpha(30),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  LucideIcons.bot,
-                  color: colorScheme.primary,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'AI Task Assistant',
-                    style: GoogleFonts.inter(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: Colors.green,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Online & Ready',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: colorScheme.onSecondary.withAlpha(180),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const Spacer(),
-              Icon(
-                LucideIcons.ellipsis_vertical,
-                color: colorScheme.onSecondary.withAlpha(150),
-              ),
-            ],
-          ),
-        ),
-
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: ListView(
-              physics: const BouncingScrollPhysics(),
-              children: [
-                const SizedBox(height: 20),
-                _buildAIMessage(
-                  context,
-                  "Hello! I'm your task assistant. What can I help you remember today?",
-                ),
-                const SizedBox(height: 24),
-                _buildUserMessage(
-                  context,
-                  "I need to finalize the quarterly budget review.",
-                ),
-                const SizedBox(height: 24),
-                _buildAIMessage(
-                  context,
-                  "Got it! Would you like me to set a deadline for that or perhaps suggest some sub-tasks?",
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              children: [
-                _buildActionChip(context, 'Add to Calendar'),
-                _buildActionChip(context, 'Set Priority'),
-                _buildActionChip(context, 'Remind me in 1hr'),
-              ],
-            ),
-          ),
-        ),
-
+        _buildHeader(colorScheme),
+        _buildMessageList(colorScheme),
+        _buildActionChips(context),
         Padding(
           padding: const EdgeInsets.all(24),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: colorScheme.secondary.withAlpha(30),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: colorScheme.secondary.withAlpha(40)),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  LucideIcons.paperclip,
-                  color: colorScheme.onSecondary.withAlpha(150),
-                  size: 20,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: TextField(
-                    style: GoogleFonts.inter(color: Colors.white, fontSize: 14),
-                    decoration: InputDecoration(
-                      hintText: 'Type a command...',
-                      hintStyle: GoogleFonts.inter(
-                        color: colorScheme.onSecondary.withAlpha(100),
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    LucideIcons.send_horizontal,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Icon(
-                  LucideIcons.mic,
-                  color: colorScheme.onSecondary.withAlpha(150),
-                  size: 20,
-                ),
-              ],
-            ),
+          child: ChatInputField(
+            controller: _controller,
+            onSend: _sendMessage,
+            isLoading: _isLoading,
           ),
         ),
         const SizedBox(height: 10),
@@ -171,88 +96,157 @@ class AIChatView extends StatelessWidget {
     );
   }
 
-  Widget _buildAIMessage(BuildContext context, String text) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CircleAvatar(
-          radius: 16,
-          backgroundColor: colorScheme.primary.withAlpha(40),
-          child: Icon(LucideIcons.bot, color: colorScheme.primary, size: 18),
-        ),
-        const SizedBox(width: 12),
-        Flexible(
-          child: Container(
-            padding: const EdgeInsets.all(16),
+  Widget _buildHeader(ColorScheme colorScheme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: colorScheme.secondary.withAlpha(30),
-              borderRadius: const BorderRadius.only(
-                topRight: Radius.circular(20),
-                bottomLeft: Radius.circular(20),
-                bottomRight: Radius.circular(20),
-              ),
+              color: colorScheme.primary.withAlpha(30),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Text(
-              text,
-              style: GoogleFonts.inter(
-                color: Colors.white.withAlpha(230),
-                fontSize: 14,
-                height: 1.5,
-              ),
-            ),
+            child: Icon(LucideIcons.bot, color: colorScheme.primary, size: 24),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUserMessage(BuildContext context, String text) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Flexible(
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: colorScheme.primary,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                bottomLeft: Radius.circular(20),
-                bottomRight: Radius.circular(20),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'AI Task Assistant',
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
-            ),
-            child: Text(
-              text,
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: 14,
-                height: 1.5,
+              Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Colors.green,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Online & Ready',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: colorScheme.onSecondary.withAlpha(180),
+                    ),
+                  ),
+                ],
               ),
-            ),
+            ],
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionChip(BuildContext context, String label) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: colorScheme.secondary.withAlpha(40),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colorScheme.secondary.withAlpha(60)),
+          const Spacer(),
+          Icon(
+            LucideIcons.ellipsis_vertical,
+            color: colorScheme.onSecondary.withAlpha(150),
+          ),
+        ],
       ),
-      child: Text(
-        label,
-        style: GoogleFonts.inter(
-          color: Colors.white,
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
+    );
+  }
+
+  Widget _buildMessageList(ColorScheme colorScheme) {
+    return Expanded(
+      child: StreamBuilder<QuerySnapshot>(
+        stream: _chatCollection
+            .orderBy('createdAt', descending: false)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Center(
+              child: Text(
+                "Error loading chat",
+                style: TextStyle(color: Colors.white),
+              ),
+            );
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final docs = snapshot.data?.docs ?? [];
+
+          if (docs.isEmpty) {
+            return _buildEmptyState(colorScheme);
+          }
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (_scrollController.hasClients) {
+              _scrollController.animateTo(
+                _scrollController.position.maxScrollExtent,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+              );
+            }
+          });
+
+          return ListView.builder(
+            controller: _scrollController,
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            itemCount: docs.length,
+            itemBuilder: (context, index) {
+              final data = docs[index].data() as Map<String, dynamic>;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: ChatBubble(
+                  text: data["text"] ?? '',
+                  isUser: data["role"] == "user",
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(ColorScheme colorScheme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            LucideIcons.bot,
+            color: colorScheme.primary.withAlpha(100),
+            size: 48,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            "No messages yet.\nStart a conversation!",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              color: colorScheme.onSecondary.withAlpha(150),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionChips(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Row(
+          children: [
+            ChatActionChip(label: 'Add to Calendar', onTap: () {}),
+            ChatActionChip(label: 'Set Priority', onTap: () {}),
+            ChatActionChip(label: 'Remind me in 1hr', onTap: () {}),
+          ],
         ),
       ),
     );
