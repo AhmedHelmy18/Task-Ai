@@ -1,0 +1,55 @@
+
+D:\Developer\Task-Ai\functions\index.js
+   1:61  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+   2:69  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+   3:72  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+   4:55  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+   5:53  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+   6:1   error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+   7:17  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+   8:27  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+   9:1   error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  10:61  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  11:1   error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  12:56  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  13:23  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  14:26  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  15:27  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  16:60  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  17:7   error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  18:4   error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  19:1   error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  20:43  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  21:1   error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  22:33  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  23:26  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  24:28  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  25:66  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  26:7   error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  27:4   error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  28:1   error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  29:8   error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  30:48  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  31:18  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  32:20  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  33:22  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  34:9   error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  35:16  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  36:47  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  37:47  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  38:8   error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  39:1   error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  40:57  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  41:74  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  42:20  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  43:57  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  44:26  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  45:20  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  46:52  error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  47:7   error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  48:4   error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+  49:4   error  Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style
+
+ظ£û 49 problems (49 errors, 0 warnings)
+  49 errors and 0 warnings potentially fixable with the `--fix` option.
+

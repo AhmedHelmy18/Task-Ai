@@ -63,7 +63,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '831069810194',
     projectId: 'task-ai-69bdc',
     storageBucket: 'task-ai-69bdc.firebasestorage.app',
-    iosClientId: '831069810194-9iavo3v320fahtaf755s51tujt70g5i8.apps.googleusercontent.com',
+    iosClientId:
+        '831069810194-9iavo3v320fahtaf755s51tujt70g5i8.apps.googleusercontent.com',
     iosBundleId: 'com.example.taskAi',
   );
 }

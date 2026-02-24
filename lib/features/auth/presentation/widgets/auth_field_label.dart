@@ -15,7 +15,7 @@ class AuthFieldLabel extends StatelessWidget {
         style: GoogleFonts.inter(
           fontSize: 14,
           fontWeight: FontWeight.w500,
-          color: Theme.of(context).colorScheme.surface.withAlpha(200),
+          color: Theme.of(context).colorScheme.onSecondary,
         ),
       ),
     );
