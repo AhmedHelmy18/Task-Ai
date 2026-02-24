@@ -73,16 +73,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: colorScheme.primary.withAlpha(30)),
                 ),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 16,
-                ), // Use symmetric padding
+                padding: const EdgeInsets.symmetric(vertical: 16),
                 child: TableCalendar(
                   firstDay: DateTime.utc(2020, 1, 1),
                   lastDay: DateTime.utc(2030, 12, 31),
                   focusedDay: _focusedDay,
                   calendarFormat: _calendarFormat,
-                  availableGestures: AvailableGestures
-                      .horizontalSwipe, // Limit gestures to prevent conflicts
+                  availableGestures: AvailableGestures.horizontalSwipe,
                   selectedDayPredicate: (day) {
                     return isSameDay(_selectedDay, day);
                   },
@@ -110,7 +107,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     headerPadding: const EdgeInsets.symmetric(
                       vertical: 0,
                       horizontal: 8,
-                    ), // Tighter header
+                    ),
                     titleTextStyle: GoogleFonts.inter(
                       color: Colors.white,
                       fontSize: 18,
@@ -139,7 +136,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   ),
                   calendarStyle: CalendarStyle(
                     defaultTextStyle: GoogleFonts.inter(color: Colors.white),
-                    weekendTextStyle: GoogleFonts.inter(color: colorScheme.primary),
+                    weekendTextStyle: GoogleFonts.inter(
+                      color: colorScheme.primary,
+                    ),
                     outsideTextStyle: GoogleFonts.inter(
                       color: colorScheme.onSecondary.withAlpha(100),
                     ),

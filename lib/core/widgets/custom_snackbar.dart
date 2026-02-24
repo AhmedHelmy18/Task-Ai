@@ -46,7 +46,7 @@ class CustomSnackBar {
             duration: const Duration(milliseconds: 400),
           )..forward(),
           curve: Curves.easeOutBack,
-        ), // Note: SnackBar manages its own animation, but we can customize the curve indirectly if needed via behavior.
+        ),
       ),
     );
   }

@@ -87,7 +87,6 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 24),
-            // Premium Calendar Header Action
             GestureDetector(
               onTap: () {
                 Navigator.push(

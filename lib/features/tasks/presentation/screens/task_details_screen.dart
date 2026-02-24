@@ -42,7 +42,6 @@ class TaskDetailsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Status Badge
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -79,7 +78,6 @@ class TaskDetailsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // Title
               Text(
                 'Project Presentation',
                 style: GoogleFonts.inter(
@@ -91,7 +89,6 @@ class TaskDetailsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Description
               Text(
                 'Prepare and deliver the final project presentation to the stakeholders. Include the latest Q3 metrics and the roadmap for Q4. Coordinate with the design team for high-fidelity mockups.',
                 style: GoogleFonts.inter(
@@ -102,7 +99,6 @@ class TaskDetailsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 32),
 
-              // Info Tiles
               _buildInfoTile(
                 context,
                 icon: LucideIcons.calendar_days,
@@ -118,7 +114,6 @@ class TaskDetailsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 40),
 
-              // Notifications Section
               Text(
                 'NOTIFICATIONS & REMINDERS',
                 style: GoogleFonts.inter(
@@ -144,7 +139,6 @@ class TaskDetailsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 60),
 
-              // Manage with AI Button
               Container(
                 width: double.infinity,
                 height: 56,

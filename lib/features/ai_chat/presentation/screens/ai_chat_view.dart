@@ -12,7 +12,6 @@ class AIChatView extends StatelessWidget {
 
     return Column(
       children: [
-        // Header
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Row(
@@ -73,7 +72,6 @@ class AIChatView extends StatelessWidget {
           ),
         ),
 
-        // Chat Content
         Expanded(
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -100,7 +98,6 @@ class AIChatView extends StatelessWidget {
           ),
         ),
 
-        // Action Chips
         Padding(
           padding: const EdgeInsets.only(top: 16),
           child: SingleChildScrollView(
@@ -117,7 +114,6 @@ class AIChatView extends StatelessWidget {
           ),
         ),
 
-        // Input Field
         Padding(
           padding: const EdgeInsets.all(24),
           child: Container(
@@ -170,7 +166,7 @@ class AIChatView extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 10), // Space for fab gap if needed
+        const SizedBox(height: 10),
       ],
     );
   }
