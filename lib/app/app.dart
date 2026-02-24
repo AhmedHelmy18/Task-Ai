@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:task_ai/app/theme.dart';
 import 'package:task_ai/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:task_ai/features/auth/presentation/cubit/auth_state.dart';
-import 'package:task_ai/features/auth/presentation/screens/login_screen.dart';
+import 'package:task_ai/features/auth/presentation/screens/onboarding_screen.dart';
 import 'package:task_ai/features/auth/presentation/screens/verify_email_screen.dart';
 import 'package:task_ai/features/home/presentation/screens/home_screen.dart';
+import 'package:task_ai/features/tasks/presentation/screens/create_task_screen.dart';
+import 'package:task_ai/features/ai_chat/presentation/screens/ai_chat_view.dart';
+import 'package:task_ai/features/notifications/presentation/screens/notifications_view.dart';
+import 'package:task_ai/features/settings/presentation/screens/settings_view.dart';
 
 class TaskAi extends StatelessWidget {
   const TaskAi({super.key});
@@ -27,17 +32,116 @@ class TaskAi extends StatelessWidget {
       home: BlocBuilder<AuthCubit, AuthState>(
         builder: (context, state) {
           if (state is AuthAuthenticated) {
-            return const HomeScreen();
+            return const MainAppShell();
           } else if (state is AuthNeedsVerification) {
             return const VerifyEmailScreen();
           } else if (state is AuthLoading || state is AuthInitial) {
-            return const Scaffold(
-              backgroundColor: Color(0xFF0F172A),
-              body: Center(child: CircularProgressIndicator()),
+            return Scaffold(
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              body: const Center(child: CircularProgressIndicator()),
             );
           }
-          return const LoginScreen();
+          return const OnboardingScreen();
         },
+      ),
+    );
+  }
+}
+
+class MainAppShell extends StatefulWidget {
+  const MainAppShell({super.key});
+
+  @override
+  State<MainAppShell> createState() => _MainAppShellState();
+}
+
+class _MainAppShellState extends State<MainAppShell> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _screens = [
+    const HomeScreen(),
+    const AIChatView(),
+    const NotificationsView(),
+    const SettingsView(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      body: SafeArea(
+        child: IndexedStack(index: _selectedIndex, children: _screens),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Container(
+        height: 64,
+        width: 64,
+        margin: const EdgeInsets.only(top: 32),
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CreateTaskScreen()),
+            );
+          },
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          child: const Icon(
+            LucideIcons.sparkles,
+            color: Colors.white,
+            size: 28,
+          ),
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        height: 80,
+        color: Theme.of(context).colorScheme.primaryContainer,
+        notchMargin: 8,
+        shape: const CircularNotchedRectangle(),
+        padding: EdgeInsets.zero,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildNavItem(0, LucideIcons.house, 'HOME'),
+            _buildNavItem(1, LucideIcons.bot, 'AI CHAT'),
+            const SizedBox(width: 64),
+            _buildNavItem(2, LucideIcons.bell, 'ALERTS'),
+            _buildNavItem(3, LucideIcons.settings, 'SETTINGS'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, IconData icon, String label) {
+    final isSelected = _selectedIndex == index;
+
+    return Expanded(
+      child: InkWell(
+        onTap: () => setState(() => _selectedIndex = index),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSecondary.withAlpha(150),
+              size: 24,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSecondary.withAlpha(150),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

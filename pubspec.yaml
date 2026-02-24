@@ -23,6 +23,8 @@ dependencies:
   flutter_bloc: ^9.1.1
   equatable: ^2.0.8
   google_sign_in: ^7.2.0
+  table_calendar: ^3.1.2
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
@@ -31,7 +33,6 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
 flutter:
-
   uses-material-design: true
 
   assets:
