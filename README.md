@@ -1,4 +1,4 @@
-# task_ai
+# whale_task
 
 A new Flutter project.
 

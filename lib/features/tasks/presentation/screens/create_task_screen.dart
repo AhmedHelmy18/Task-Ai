@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:task_ai/features/auth/presentation/widgets/auth_field_label.dart';
+import 'package:whale_task/features/auth/presentation/widgets/auth_field_label.dart';
 import '../widgets/create_task_widgets.dart';
 
 class CreateTaskScreen extends StatelessWidget {
