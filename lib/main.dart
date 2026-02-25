@@ -18,10 +18,8 @@ void main() async {
   );
 
   if (kDebugMode) {
-    final String host =
-        kIsWeb || defaultTargetPlatform != TargetPlatform.android
-        ? 'localhost'
-        : '10.0.2.2';
+    final String host ="10.0.2.2";
+
     await FirebaseAuth.instance.useAuthEmulator(host, 9099);
     FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
     FirebaseFirestore.instance.settings = const Settings(

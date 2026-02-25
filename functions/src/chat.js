@@ -50,10 +50,15 @@ exports.chatWithAI = (geminiApiKey) =>
       const genAI = new GoogleGenerativeAI(key);
       const model = genAI.getGenerativeModel({
         model: "gemini-2.5-flash",
+        systemInstruction: "You are a helpful task manager assistant. When " +
+          "a user gives you a complex goal, break it down into multiple " +
+          "actionable tasks. Use the create_task tool for EACH task " +
+          "you identify.",
         tools: [{
           functionDeclarations: [{
             name: "create_task",
-            description: "Create a new task with a specific title and status",
+            description: "Create a new task. Call this multiple times if a " +
+              "goal has multiple steps.",
             parameters: {
               type: SchemaType.OBJECT,
               properties: {
@@ -65,6 +70,11 @@ exports.chatWithAI = (geminiApiKey) =>
                   type: SchemaType.STRING,
                   description: "The status of the task (todo or completed)",
                   enum: ["todo", "completed"],
+                },
+                priority: {
+                  type: SchemaType.STRING,
+                  description: "The priority of the task (Low, Medium, High)",
+                  enum: ["Low", "Medium", "High"],
                 },
               },
               required: ["title"],
@@ -82,31 +92,39 @@ exports.chatWithAI = (geminiApiKey) =>
       try {
         aiText = response.text();
       } catch (e) {
-        aiText = "Processing your request...";
+        aiText = "";
       }
 
       let isFunctionCall = false;
       let functionName = null;
       let functionArgs = null;
+      const createdTasks = [];
 
       if (functionCalls && functionCalls.length > 0) {
-        const call = functionCalls[0];
         isFunctionCall = true;
-        functionName = call.name;
-        functionArgs = call.args;
-
-        if (call.name === "create_task") {
-          const {title, status} = call.args;
-          logger.info(`AI requested to create a task: ${title}`);
-          await db.collection("tasks").add({
-            userId: uid,
-            listId: listId || null,
-            title: title,
-            status: status || "todo",
-            createdAt: FieldValue.serverTimestamp(),
-            updatedAt: FieldValue.serverTimestamp(),
-          });
-          aiText = `I've created the task "${title}" for you.`;
+        for (const call of functionCalls) {
+          if (call.name === "create_task") {
+            const {title, status, priority} = call.args;
+            logger.info(`AI requested to create a task: ${title}`);
+            await db.collection("tasks").add({
+              userId: uid,
+              listId: listId || null,
+              title: title,
+              status: status || "todo",
+              priority: priority || "Medium",
+              createdAt: FieldValue.serverTimestamp(),
+              updatedAt: FieldValue.serverTimestamp(),
+            });
+            createdTasks.push(title);
+            functionName = "create_task";
+            functionArgs = call.args;
+          }
+        }
+        if (createdTasks.length > 1) {
+          aiText = `I've created ${createdTasks.length} tasks for you: ` +
+              `${createdTasks.join(", ")}.`;
+        } else if (createdTasks.length === 1) {
+          aiText = `I've created the task "${createdTasks[0]}" for you.`;
         }
       }
 

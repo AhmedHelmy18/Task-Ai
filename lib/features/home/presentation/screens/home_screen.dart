@@ -91,7 +91,11 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildPriorityTasks(tasks, context),
                   const SizedBox(height: 32),
-                  _buildSectionTitle(context, 'Upcoming Tasks', showFilter: true),
+                  _buildSectionTitle(
+                    context,
+                    'Upcoming Tasks',
+                    showFilter: true,
+                  ),
                   const SizedBox(height: 20),
                   _buildUpcomingTasks(tasks, context),
                   const SizedBox(height: 24),
@@ -342,9 +346,18 @@ class HomeScreen extends StatelessWidget {
     List<QueryDocumentSnapshot> tasks,
     BuildContext context,
   ) {
-    if (tasks.isEmpty) {
+    // Filter for High priority tasks
+    final priorityTasks = tasks.where((doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      return data['priority'] == 'High';
+    }).toList();
+
+    if (priorityTasks.isEmpty) {
       return const Center(
-        child: Text("No tasks yet", style: TextStyle(color: Colors.white54)),
+        child: Text(
+          "No high priority tasks",
+          style: TextStyle(color: Colors.white54),
+        ),
       );
     }
     return SizedBox(
@@ -352,17 +365,24 @@ class HomeScreen extends StatelessWidget {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
-        itemCount: tasks.length,
+        itemCount: priorityTasks.length,
         itemBuilder: (context, index) {
-          final data = tasks[index].data() as Map<String, dynamic>;
+          final data = priorityTasks[index].data() as Map<String, dynamic>;
+          final priority = data['priority'] ?? 'Medium';
+          final status = data['status'] ?? 'todo';
+
           return TaskCard(
             title: data['title'] ?? 'Untitled',
             description: data['description'] ?? 'No description provided',
-            priority: data['status'] == 'completed' ? 'COMPLETED' : 'PENDING',
+            priority: status == 'completed'
+                ? 'COMPLETED'
+                : priority.toUpperCase(),
             duration: 'Updated just now',
-            priorityColor: data['status'] == 'completed'
+            priorityColor: status == 'completed'
                 ? Colors.green
-                : Theme.of(context).colorScheme.secondary,
+                : (priority == 'High'
+                      ? Colors.orange
+                      : Theme.of(context).colorScheme.secondary),
             onTap: () {
               Navigator.push(
                 context,
@@ -438,11 +458,20 @@ class HomeScreen extends StatelessWidget {
           iconColor = const Color(0xFF38BDF8);
         }
 
+        final isCompleted = data['status'] == 'completed';
+
         return UpcomingTaskTile(
           title: title,
           subtitle: '${isRecurring ? 'Recurring' : 'One-time'} • $timeStr',
           icon: icon,
           iconBgColor: iconColor,
+          isCompleted: isCompleted,
+          onToggle: () {
+            tasks[index].reference.update({
+              'status': isCompleted ? 'todo' : 'completed',
+              'updatedAt': FieldValue.serverTimestamp(),
+            });
+          },
           onTap: () {
             Navigator.push(
               context,

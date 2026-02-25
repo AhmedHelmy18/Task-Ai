@@ -21,12 +21,11 @@ class TaskAi extends StatelessWidget {
     return MaterialApp(
       title: 'Whale-task',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: appDarkTheme,
+      theme: appTheme.copyWith(
         textTheme: GoogleFonts.interTextTheme(),
         textSelectionTheme: TextSelectionThemeData(
-          selectionColor: Theme.of(context).colorScheme.primary.withAlpha(128),
-          selectionHandleColor: Theme.of(context).colorScheme.primary,
+          selectionColor: appDarkTheme.primary.withAlpha(128),
+          selectionHandleColor: appDarkTheme.primary,
         ),
       ),
       home: BlocBuilder<AuthCubit, AuthState>(

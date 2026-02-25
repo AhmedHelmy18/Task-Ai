@@ -50,7 +50,7 @@ class ListDetailScreen extends StatelessWidget {
                 ),
               );
             },
-            icon: const Icon(LucideIcons.message_square, color: Colors.white),
+            icon: const Icon(LucideIcons.sparkles, color: Colors.white),
           ),
         ],
       ),
@@ -135,11 +135,20 @@ class ListDetailScreen extends StatelessWidget {
                 }
               }
 
+              final isCompleted = data['status'] == 'completed';
+
               return UpcomingTaskTile(
                 title: title,
                 subtitle: timeStr,
                 icon: icon,
                 iconBgColor: iconColor,
+                isCompleted: isCompleted,
+                onToggle: () {
+                  tasks[index].reference.update({
+                    'status': isCompleted ? 'todo' : 'completed',
+                    'updatedAt': FieldValue.serverTimestamp(),
+                  });
+                },
                 onTap: () {
                   Navigator.push(
                     context,

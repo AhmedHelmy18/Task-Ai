@@ -213,6 +213,8 @@ class UpcomingTaskTile extends StatelessWidget {
   final String subtitle;
   final IconData icon;
   final Color iconBgColor;
+  final bool isCompleted;
+  final VoidCallback? onToggle;
   final VoidCallback? onTap;
 
   const UpcomingTaskTile({
@@ -221,6 +223,8 @@ class UpcomingTaskTile extends StatelessWidget {
     required this.subtitle,
     required this.icon,
     required this.iconBgColor,
+    this.isCompleted = false,
+    this.onToggle,
     this.onTap,
   });
 
@@ -270,15 +274,30 @@ class UpcomingTaskTile extends StatelessWidget {
                 ],
               ),
             ),
-            Container(
-              width: 22,
-              height: 22,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white.withAlpha(50),
-                  width: 1.5,
+            GestureDetector(
+              onTap: onToggle,
+              child: Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isCompleted
+                      ? Theme.of(context).colorScheme.primary
+                      : Colors.transparent,
+                  border: Border.all(
+                    color: isCompleted
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.white.withAlpha(50),
+                    width: 1.5,
+                  ),
                 ),
+                child: isCompleted
+                    ? const Icon(
+                        LucideIcons.check,
+                        color: Colors.white,
+                        size: 14,
+                      )
+                    : null,
               ),
             ),
           ],
