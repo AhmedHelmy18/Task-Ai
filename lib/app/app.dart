@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:task_ai/app/theme.dart';
-import 'package:task_ai/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:task_ai/features/auth/presentation/cubit/auth_state.dart';
-import 'package:task_ai/features/auth/presentation/screens/onboarding_screen.dart';
-import 'package:task_ai/features/auth/presentation/screens/verify_email_screen.dart';
-import 'package:task_ai/features/home/presentation/screens/home_screen.dart';
-import 'package:task_ai/features/tasks/presentation/screens/create_task_screen.dart';
-import 'package:task_ai/features/ai_chat/presentation/screens/ai_chat_view.dart';
-import 'package:task_ai/features/notifications/presentation/screens/notifications_view.dart';
-import 'package:task_ai/features/settings/presentation/screens/settings_view.dart';
+import 'package:whale_task/app/theme.dart';
+import 'package:whale_task/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:whale_task/features/auth/presentation/cubit/auth_state.dart';
+import 'package:whale_task/features/auth/presentation/screens/onboarding_screen.dart';
+import 'package:whale_task/features/auth/presentation/screens/verify_email_screen.dart';
+import 'package:whale_task/features/home/presentation/screens/home_screen.dart';
+import 'package:whale_task/features/tasks/presentation/screens/create_task_screen.dart';
+import 'package:whale_task/features/ai_chat/presentation/screens/ai_chat_view.dart';
+import 'package:whale_task/features/notifications/presentation/screens/notifications_view.dart';
+import 'package:whale_task/features/settings/presentation/screens/settings_view.dart';
 
 class TaskAi extends StatelessWidget {
   const TaskAi({super.key});

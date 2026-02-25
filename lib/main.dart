@@ -5,9 +5,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task_ai/app/app.dart';
-import 'package:task_ai/features/auth/data/repositories/auth_repository.dart';
-import 'package:task_ai/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:whale_task/app/app.dart';
+import 'package:whale_task/features/auth/data/repositories/auth_repository.dart';
+import 'package:whale_task/features/auth/presentation/cubit/auth_cubit.dart';
 import 'firebase_options.dart';
 
 void main() async {

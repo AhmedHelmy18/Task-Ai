@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:task_ai/core/utils/auth_validator.dart';
-import 'package:task_ai/core/widgets/custom_input_field.dart';
-import 'package:task_ai/core/widgets/custom_snackbar.dart';
-import 'package:task_ai/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:task_ai/features/auth/presentation/cubit/auth_state.dart';
-import 'package:task_ai/features/auth/presentation/widgets/auth_field_label.dart';
+import 'package:whale_task/core/utils/auth_validator.dart';
+import 'package:whale_task/core/widgets/custom_input_field.dart';
+import 'package:whale_task/core/widgets/custom_snackbar.dart';
+import 'package:whale_task/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:whale_task/features/auth/presentation/cubit/auth_state.dart';
+import 'package:whale_task/features/auth/presentation/widgets/auth_field_label.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});

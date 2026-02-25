@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:task_ai/features/home/presentation/widgets/dashboard_widgets.dart';
-import 'package:task_ai/features/calendar/presentation/screens/calendar_screen.dart';
+import 'package:whale_task/features/home/presentation/widgets/dashboard_widgets.dart';
+import 'package:whale_task/features/calendar/presentation/screens/calendar_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

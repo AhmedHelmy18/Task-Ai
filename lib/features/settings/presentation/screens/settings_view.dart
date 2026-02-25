@@ -2,11 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:task_ai/features/settings/presentation/widgets/logout_button.dart';
-import 'package:task_ai/features/settings/presentation/widgets/profile_tile.dart';
-import 'package:task_ai/features/settings/presentation/widgets/setting_tile.dart';
-import 'package:task_ai/features/settings/presentation/widgets/settings_section_header.dart';
-import 'package:task_ai/features/settings/presentation/widgets/theme_selector.dart';
+import 'package:whale_task/features/settings/presentation/widgets/logout_button.dart';
+import 'package:whale_task/features/settings/presentation/widgets/profile_tile.dart';
+import 'package:whale_task/features/settings/presentation/widgets/setting_tile.dart';
+import 'package:whale_task/features/settings/presentation/widgets/settings_section_header.dart';
+import 'package:whale_task/features/settings/presentation/widgets/theme_selector.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
