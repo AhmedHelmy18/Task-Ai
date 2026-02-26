@@ -9,24 +9,23 @@ import 'package:whale_task/features/auth/presentation/screens/onboarding_screen.
 import 'package:whale_task/features/auth/presentation/screens/verify_email_screen.dart';
 import 'package:whale_task/features/home/presentation/screens/home_screen.dart';
 import 'package:whale_task/features/tasks/presentation/screens/create_task_screen.dart';
-import 'package:whale_task/features/ai_chat/presentation/screens/ai_chat_view.dart';
 import 'package:whale_task/features/notifications/presentation/screens/notifications_view.dart';
 import 'package:whale_task/features/settings/presentation/screens/settings_view.dart';
+import 'package:whale_task/features/lists/presentation/screens/lists_screen.dart';
 
-class TaskAi extends StatelessWidget {
-  const TaskAi({super.key});
+class App extends StatelessWidget {
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Whale-task',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: appDarkTheme,
+      theme: appTheme.copyWith(
         textTheme: GoogleFonts.interTextTheme(),
         textSelectionTheme: TextSelectionThemeData(
-          selectionColor: Theme.of(context).colorScheme.primary.withAlpha(128),
-          selectionHandleColor: Theme.of(context).colorScheme.primary,
+          selectionColor: appDarkTheme.primary.withAlpha(128),
+          selectionHandleColor: appDarkTheme.primary,
         ),
       ),
       home: BlocBuilder<AuthCubit, AuthState>(
@@ -60,7 +59,7 @@ class _MainAppShellState extends State<MainAppShell> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const AIChatView(),
+    const ListsScreen(),
     const NotificationsView(),
     const SettingsView(),
   ];
@@ -102,7 +101,7 @@ class _MainAppShellState extends State<MainAppShell> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildNavItem(0, LucideIcons.house, 'HOME'),
-            _buildNavItem(1, LucideIcons.bot, 'AI CHAT'),
+            _buildNavItem(1, LucideIcons.list_todo, 'LISTS'),
             const SizedBox(width: 64),
             _buildNavItem(2, LucideIcons.bell, 'ALERTS'),
             _buildNavItem(3, LucideIcons.settings, 'SETTINGS'),

@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.task_ai"
+    namespace = "com.example.whale_task"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.task_ai"
+        applicationId = "com.example.whale_task"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

@@ -3,10 +3,20 @@ import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ProgressCard extends StatelessWidget {
-  const ProgressCard({super.key});
+  final int completedCount;
+  final int totalCount;
+
+  const ProgressCard({
+    super.key,
+    required this.completedCount,
+    required this.totalCount,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final percentage = totalCount > 0 ? (completedCount / totalCount) : 0.0;
+    final percentText = "${(percentage * 100).toInt()}%";
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -45,7 +55,7 @@ class ProgressCard extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                '3 of 8 completed',
+                '$completedCount of $totalCount completed',
                 style: GoogleFonts.inter(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -61,7 +71,7 @@ class ProgressCard extends StatelessWidget {
                 width: 60,
                 height: 60,
                 child: CircularProgressIndicator(
-                  value: 3 / 8,
+                  value: percentage,
                   strokeWidth: 6,
                   backgroundColor: Colors.white.withAlpha(40),
                   valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
@@ -69,7 +79,7 @@ class ProgressCard extends StatelessWidget {
                 ),
               ),
               Text(
-                '37%',
+                percentText,
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -90,6 +100,7 @@ class TaskCard extends StatelessWidget {
   final String priority;
   final String duration;
   final Color priorityColor;
+  final VoidCallback onTap;
 
   const TaskCard({
     super.key,
@@ -98,93 +109,100 @@ class TaskCard extends StatelessWidget {
     required this.priority,
     required this.duration,
     required this.priorityColor,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 260,
-      margin: const EdgeInsets.only(right: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainer.withAlpha(30),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.surfaceContainer.withAlpha(40),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(24),
+      child: Container(
+        width: 260,
+        margin: const EdgeInsets.only(right: 16),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainer.withAlpha(30),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.surfaceContainer.withAlpha(40),
+          ),
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: priorityColor.withAlpha(30),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  priority,
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    color: priorityColor,
-                    letterSpacing: 0.5,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: priorityColor.withAlpha(30),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    priority,
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: priorityColor,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                 ),
-              ),
-              Icon(
-                LucideIcons.ellipsis,
-                color: Theme.of(context).colorScheme.onSecondary.withAlpha(150),
-                size: 20,
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Text(
-            title,
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+                Icon(
+                  LucideIcons.ellipsis,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSecondary.withAlpha(150),
+                  size: 20,
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            description,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              color: Theme.of(context).colorScheme.onSecondary,
-              height: 1.4,
-            ),
-          ),
-          const Spacer(),
-          Row(
-            children: [
-              Icon(
-                LucideIcons.clock,
-                size: 14,
-                color: Theme.of(context).colorScheme.primary,
+            const SizedBox(height: 20),
+            Text(
+              title,
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
-              const SizedBox(width: 8),
-              Text(
-                duration,
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              description,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: Theme.of(context).colorScheme.onSecondary,
+                height: 1.4,
+              ),
+            ),
+            const Spacer(),
+            Row(
+              children: [
+                Icon(
+                  LucideIcons.clock,
+                  size: 14,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-              ),
-            ],
-          ),
-        ],
+                const SizedBox(width: 8),
+                Text(
+                  duration,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -195,6 +213,9 @@ class UpcomingTaskTile extends StatelessWidget {
   final String subtitle;
   final IconData icon;
   final Color iconBgColor;
+  final bool isCompleted;
+  final VoidCallback? onToggle;
+  final VoidCallback? onTap;
 
   const UpcomingTaskTile({
     super.key,
@@ -202,64 +223,85 @@ class UpcomingTaskTile extends StatelessWidget {
     required this.subtitle,
     required this.icon,
     required this.iconBgColor,
+    this.isCompleted = false,
+    this.onToggle,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainer.withAlpha(20),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: iconBgColor.withAlpha(30),
-              borderRadius: BorderRadius.circular(14),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF151932),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: iconBgColor.withAlpha(25),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: iconBgColor, size: 20),
             ),
-            child: Icon(icon, color: iconBgColor, size: 22),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    color: Theme.of(context).colorScheme.onSecondary,
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: Colors.white.withAlpha(100),
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Theme.of(context).colorScheme.onSecondary.withAlpha(60),
-                width: 2,
+                ],
               ),
             ),
-          ),
-        ],
+            GestureDetector(
+              onTap: onToggle,
+              child: Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isCompleted
+                      ? Theme.of(context).colorScheme.primary
+                      : Colors.transparent,
+                  border: Border.all(
+                    color: isCompleted
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.white.withAlpha(50),
+                    width: 1.5,
+                  ),
+                ),
+                child: isCompleted
+                    ? const Icon(
+                  LucideIcons.check,
+                  color: Colors.white,
+                  size: 14,
+                )
+                    : null,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
