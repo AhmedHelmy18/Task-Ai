@@ -126,10 +126,10 @@ class ListDetailScreen extends StatelessWidget {
                 final now = DateTime.now();
                 if (reminderTime.day == now.day) {
                   timeStr =
-                      'Today, ${DateFormat('h:mm a').format(reminderTime)}';
+                  'Today, ${DateFormat('h:mm a').format(reminderTime)}';
                 } else if (reminderTime.day == now.day + 1) {
                   timeStr =
-                      'Tomorrow, ${DateFormat('h:mm a').format(reminderTime)}';
+                  'Tomorrow, ${DateFormat('h:mm a').format(reminderTime)}';
                 } else {
                   timeStr = DateFormat('MMM d').format(reminderTime);
                 }

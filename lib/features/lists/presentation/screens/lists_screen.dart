@@ -58,10 +58,10 @@ class ListsScreen extends StatelessWidget {
   }
 
   Future<void> _renameList(
-    BuildContext context,
-    String listId,
-    String currentTitle,
-  ) async {
+      BuildContext context,
+      String listId,
+      String currentTitle,
+      ) async {
     final controller = TextEditingController(text: currentTitle);
     final result = await showDialog<String>(
       context: context,

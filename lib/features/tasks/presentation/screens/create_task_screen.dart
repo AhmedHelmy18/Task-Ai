@@ -72,9 +72,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                 ),
                 trailing: _recurring == option
                     ? Icon(
-                        LucideIcons.check,
-                        color: Theme.of(context).colorScheme.primary,
-                      )
+                  LucideIcons.check,
+                  color: Theme.of(context).colorScheme.primary,
+                )
                     : null,
                 onTap: () {
                   setState(() => _recurring = option);
@@ -109,9 +109,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                 ),
                 trailing: _selectedSound == sound
                     ? Icon(
-                        LucideIcons.check,
-                        color: Theme.of(context).colorScheme.primary,
-                      )
+                  LucideIcons.check,
+                  color: Theme.of(context).colorScheme.primary,
+                )
                     : null,
                 onTap: () {
                   setState(() => _selectedSound = sound);
@@ -285,19 +285,19 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                   child: _isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
                       : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(LucideIcons.circle_check, size: 20),
-                            const SizedBox(width: 8),
-                            const Text(
-                              'Save Task',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(LucideIcons.circle_check, size: 20),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Save Task',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                         ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -308,11 +308,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   }
 
   Widget _buildTextField(
-    BuildContext context, {
-    required TextEditingController controller,
-    required String hint,
-    int maxLines = 1,
-  }) {
+      BuildContext context, {
+        required TextEditingController controller,
+        required String hint,
+        int maxLines = 1,
+      }) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),

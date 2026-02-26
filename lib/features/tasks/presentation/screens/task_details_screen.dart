@@ -249,12 +249,12 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   }
 
   Widget _buildModernInfoCard(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color iconColor,
-  }) {
+      BuildContext context, {
+        required IconData icon,
+        required String label,
+        required String value,
+        required Color iconColor,
+      }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

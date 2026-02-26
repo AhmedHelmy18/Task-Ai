@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whale_task/app/app.dart';
 import 'package:whale_task/features/auth/data/repositories/auth_repository.dart';
 import 'package:whale_task/features/auth/presentation/cubit/auth_cubit.dart';
-import 'firebase_options.dart';
+import 'package:whale_task/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,7 +39,7 @@ void main() async {
             create: (context) => AuthCubit(authRepository)..checkAuthStatus(),
           ),
         ],
-        child: const TaskAi(),
+        child: const App(),
       ),
     ),
   );

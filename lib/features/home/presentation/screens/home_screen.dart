@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:whale_task/features/home/presentation/widgets/dashboard_widgets.dart';
-import 'package:whale_task/features/calendar/presentation/screens/calendar_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:whale_task/features/home/presentation/widgets/dashboard_widgets.dart';
 import 'package:whale_task/features/calendar/presentation/screens/calendar_screen.dart';
@@ -199,10 +197,10 @@ class HomeScreen extends StatelessWidget {
               : null,
           child: user?.photoURL == null
               ? Icon(
-                  LucideIcons.user,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 20,
-                )
+            LucideIcons.user,
+            color: Theme.of(context).colorScheme.primary,
+            size: 20,
+          )
               : null,
         ),
         Positioned(
@@ -305,10 +303,10 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildSectionTitle(
-    BuildContext context,
-    String title, {
-    bool showFilter = false,
-  }) {
+      BuildContext context,
+      String title, {
+        bool showFilter = false,
+      }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -343,9 +341,9 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildPriorityTasks(
-    List<QueryDocumentSnapshot> tasks,
-    BuildContext context,
-  ) {
+      List<QueryDocumentSnapshot> tasks,
+      BuildContext context,
+      ) {
     // Filter for High priority tasks
     final priorityTasks = tasks.where((doc) {
       final data = doc.data() as Map<String, dynamic>;
@@ -381,8 +379,8 @@ class HomeScreen extends StatelessWidget {
             priorityColor: status == 'completed'
                 ? Colors.green
                 : (priority == 'High'
-                      ? Colors.orange
-                      : Theme.of(context).colorScheme.secondary),
+                ? Colors.orange
+                : Theme.of(context).colorScheme.secondary),
             onTap: () {
               Navigator.push(
                 context,
@@ -398,9 +396,9 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildUpcomingTasks(
-    List<QueryDocumentSnapshot> tasks,
-    BuildContext context,
-  ) {
+      List<QueryDocumentSnapshot> tasks,
+      BuildContext context,
+      ) {
     if (tasks.isEmpty) {
       return const Center(
         child: Text(

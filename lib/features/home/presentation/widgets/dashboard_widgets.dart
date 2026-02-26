@@ -293,10 +293,10 @@ class UpcomingTaskTile extends StatelessWidget {
                 ),
                 child: isCompleted
                     ? const Icon(
-                        LucideIcons.check,
-                        color: Colors.white,
-                        size: 14,
-                      )
+                  LucideIcons.check,
+                  color: Colors.white,
+                  size: 14,
+                )
                     : null,
               ),
             ),

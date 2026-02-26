@@ -111,18 +111,18 @@ class ChatInputField extends StatelessWidget {
               ),
               child: isLoading
                   ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
                   : const Icon(
-                      LucideIcons.send_horizontal,
-                      color: Colors.white,
-                      size: 18,
-                    ),
+                LucideIcons.send_horizontal,
+                color: Colors.white,
+                size: 18,
+              ),
             ),
           ),
           const SizedBox(width: 8),

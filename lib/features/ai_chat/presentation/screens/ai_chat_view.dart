@@ -9,10 +9,10 @@ import 'package:whale_task/features/ai_chat/presentation/widgets/chat_widgets.da
 import 'package:whale_task/features/ai_chat/presentation/widgets/message_list_view.dart';
 
 class AIChatView extends StatefulWidget {
-  final String? listId;
-  final String? listTitle;
+  final String listId;
+  final String listTitle;
 
-  const AIChatView({super.key, this.listId, this.listTitle});
+  const AIChatView({super.key, required this.listId, required this.listTitle});
 
   @override
   State<AIChatView> createState() => _AIChatViewState();
@@ -80,7 +80,7 @@ class _AIChatViewState extends State<AIChatView> {
           children: [
             _buildHeader(colorScheme),
             MessageListView(
-              chatId: widget.listId!,
+              chatId: widget.listId,
               messagesCollection: _messagesCollection,
               scrollController: _scrollController,
             ),
@@ -114,7 +114,7 @@ class _AIChatViewState extends State<AIChatView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.listTitle!,
+                widget.listTitle,
                 style: GoogleFonts.inter(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
