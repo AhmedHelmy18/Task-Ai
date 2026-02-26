@@ -140,6 +140,7 @@ class SettingTile extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color iconColor;
+  final VoidCallback? onTap;
 
   const SettingTile({
     super.key,
@@ -147,6 +148,7 @@ class SettingTile extends StatelessWidget {
     required this.value,
     required this.icon,
     required this.iconColor,
+    this.onTap,
   });
 
   @override
@@ -156,50 +158,56 @@ class SettingTile extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: colorScheme.secondary.withAlpha(20),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: iconColor.withAlpha(30),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: iconColor, size: 20),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: iconColor.withAlpha(30),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                Text(
-                  value,
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    color: colorScheme.onSecondary,
-                  ),
+                child: Icon(icon, color: iconColor, size: 20),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      value,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        color: colorScheme.onSecondary,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              Icon(
+                LucideIcons.chevron_right,
+                color: colorScheme.onSecondary.withAlpha(100),
+                size: 20,
+              ),
+            ],
           ),
-          Icon(
-            LucideIcons.chevron_right,
-            color: colorScheme.onSecondary.withAlpha(100),
-            size: 20,
-          ),
-        ],
+        ),
       ),
     );
   }

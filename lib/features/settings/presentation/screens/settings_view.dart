@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:whale_task/features/settings/presentation/widgets/logout_button.dart';
@@ -7,9 +8,64 @@ import 'package:whale_task/features/settings/presentation/widgets/profile_tile.d
 import 'package:whale_task/features/settings/presentation/widgets/setting_tile.dart';
 import 'package:whale_task/features/settings/presentation/widgets/settings_section_header.dart';
 import 'package:whale_task/features/settings/presentation/widgets/theme_selector.dart';
+import 'package:whale_task/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:whale_task/features/settings/presentation/widgets/logout_button.dart';
+import 'package:whale_task/features/settings/presentation/widgets/profile_tile.dart';
+import 'package:whale_task/features/settings/presentation/widgets/setting_tile.dart';
+import 'package:whale_task/features/settings/presentation/widgets/settings_section_header.dart';
+import 'package:whale_task/features/settings/presentation/widgets/theme_selector.dart';
 
-class SettingsView extends StatelessWidget {
+class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
+
+  @override
+  State<SettingsView> createState() => _SettingsViewState();
+}
+
+class _SettingsViewState extends State<SettingsView> {
+  bool _pushNotifications = true;
+  bool _marketingEmails = false;
+
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF151932),
+        title: Text(
+          'Log Out',
+          style: GoogleFonts.inter(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to log out?',
+          style: GoogleFonts.inter(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'CANCEL',
+              style: GoogleFonts.inter(color: Colors.white54),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.read<AuthCubit>().signOut();
+            },
+            child: Text(
+              'LOG OUT',
+              style: GoogleFonts.inter(
+                color: Theme.of(context).colorScheme.error,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +100,6 @@ class SettingsView extends StatelessWidget {
             ],
           ),
         ),
-
         Expanded(
           child: ListView(
             physics: const BouncingScrollPhysics(),
@@ -53,8 +108,8 @@ class SettingsView extends StatelessWidget {
               const SizedBox(height: 24),
               const SettingsSectionHeader(title: 'ACCOUNT'),
               ProfileTile(
-                name: user?.displayName ?? 'Alex Thompson',
-                email: user?.email ?? 'alex.t@design.com',
+                name: user?.displayName ?? 'User Name',
+                email: user?.email ?? 'user@email.com',
                 avatarUrl: user?.photoURL,
               ),
               const SizedBox(height: 12),
@@ -62,25 +117,23 @@ class SettingsView extends StatelessWidget {
                 icon: LucideIcons.lock,
                 title: 'Security & Password',
               ),
-
               const SizedBox(height: 32),
               const SettingsSectionHeader(title: 'NOTIFICATIONS'),
               SettingsToggleTile(
                 icon: LucideIcons.bell,
                 title: 'Push Notifications',
                 subtitle: 'Alerts on your lock screen',
-                value: true,
-                onChanged: (v) {},
+                value: _pushNotifications,
+                onChanged: (v) => setState(() => _pushNotifications = v),
               ),
               const SizedBox(height: 12),
               SettingsToggleTile(
                 icon: LucideIcons.mail,
                 title: 'Marketing Emails',
                 subtitle: 'Updates and offers',
-                value: false,
-                onChanged: (v) {},
+                value: _marketingEmails,
+                onChanged: (v) => setState(() => _marketingEmails = v),
               ),
-
               const SizedBox(height: 32),
               const SettingsSectionHeader(title: 'REMINDER SOUNDS'),
               const SettingsDropdownTile(
@@ -88,14 +141,11 @@ class SettingsView extends StatelessWidget {
                 title: 'Default Sound',
                 value: 'Crystal Chime',
               ),
-
               const SizedBox(height: 32),
               const SettingsSectionHeader(title: 'APP THEME'),
               const ThemeSelector(),
-
               const SizedBox(height: 48),
-              const LogoutButton(),
-
+              LogoutButton(onPressed: _showLogoutDialog),
               const SizedBox(height: 32),
               Center(
                 child: Text(

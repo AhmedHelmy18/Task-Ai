@@ -4,11 +4,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:task_ai/core/widgets/custom_snackbar.dart';
-import 'package:task_ai/features/ai_chat/presentation/widgets/chat_widgets.dart';
+import 'package:whale_task/core/widgets/custom_snackbar.dart';
+import 'package:whale_task/features/ai_chat/presentation/widgets/chat_widgets.dart';
+import 'package:whale_task/features/ai_chat/presentation/widgets/message_list_view.dart';
 
 class AIChatView extends StatefulWidget {
-  const AIChatView({super.key});
+  final String? listId;
+  final String? listTitle;
+
+  const AIChatView({super.key, this.listId, this.listTitle});
 
   @override
   State<AIChatView> createState() => _AIChatViewState();
@@ -21,10 +25,10 @@ class _AIChatViewState extends State<AIChatView> {
 
   String get _uid => FirebaseAuth.instance.currentUser?.uid ?? '';
 
-  CollectionReference get _chatCollection => FirebaseFirestore.instance
-      .collection('users')
-      .doc(_uid)
-      .collection('ai_chat_messages');
+  CollectionReference get _messagesCollection => FirebaseFirestore.instance
+      .collection('lists')
+      .doc(widget.listId)
+      .collection('messages');
 
   Future<void> _sendMessage() async {
     final text = _controller.text.trim();
@@ -34,13 +38,8 @@ class _AIChatViewState extends State<AIChatView> {
     setState(() => _isLoading = true);
 
     try {
-      await _chatCollection.add({
-        "role": "user",
-        "text": text,
-        "createdAt": FieldValue.serverTimestamp(),
-      });
-
-      final historySnapshot = await _chatCollection
+      // Fetch history for AI
+      final historySnapshot = await _messagesCollection
           .orderBy('createdAt', descending: true)
           .limit(10)
           .get();
@@ -50,19 +49,15 @@ class _AIChatViewState extends State<AIChatView> {
         return {
           "role": data["role"] == "user" ? "user" : "model",
           "parts": [
-            {"text": data["text"]},
+            {"text": data["content"]},
           ],
         };
       }).toList();
 
-      final result = await FirebaseFunctions.instance
-          .httpsCallable('chatWithAI')
-          .call({"prompt": text, "history": history});
-
-      await _chatCollection.add({
-        "role": "model",
-        "text": result.data['text'],
-        "createdAt": FieldValue.serverTimestamp(),
+      await FirebaseFunctions.instance.httpsCallable('chatWithAI').call({
+        "prompt": text,
+        "history": history,
+        "listId": widget.listId,
       });
     } catch (e) {
       if (mounted) {
@@ -78,21 +73,30 @@ class _AIChatViewState extends State<AIChatView> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Column(
-      children: [
-        _buildHeader(colorScheme),
-        _buildMessageList(colorScheme),
-        _buildActionChips(context),
-        Padding(
-          padding: const EdgeInsets.all(24),
-          child: ChatInputField(
-            controller: _controller,
-            onSend: _sendMessage,
-            isLoading: _isLoading,
-          ),
+    return Scaffold(
+      backgroundColor: colorScheme.primaryContainer,
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(colorScheme),
+            MessageListView(
+              chatId: widget.listId!,
+              messagesCollection: _messagesCollection,
+              scrollController: _scrollController,
+            ),
+            _buildActionChips(context),
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: ChatInputField(
+                controller: _controller,
+                onSend: _sendMessage,
+                isLoading: _isLoading,
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
         ),
-        const SizedBox(height: 10),
-      ],
+      ),
     );
   }
 
@@ -101,21 +105,16 @@ class _AIChatViewState extends State<AIChatView> {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Row(
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: colorScheme.primary.withAlpha(30),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(LucideIcons.bot, color: colorScheme.primary, size: 24),
+          IconButton(
+            icon: const Icon(LucideIcons.chevron_left, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'AI Task Assistant',
+                widget.listTitle!,
                 style: GoogleFonts.inter(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -134,7 +133,7 @@ class _AIChatViewState extends State<AIChatView> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    'Online & Ready',
+                    'Online',
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       color: colorScheme.onSecondary.withAlpha(180),
@@ -145,90 +144,6 @@ class _AIChatViewState extends State<AIChatView> {
             ],
           ),
           const Spacer(),
-          Icon(
-            LucideIcons.ellipsis_vertical,
-            color: colorScheme.onSecondary.withAlpha(150),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMessageList(ColorScheme colorScheme) {
-    return Expanded(
-      child: StreamBuilder<QuerySnapshot>(
-        stream: _chatCollection
-            .orderBy('createdAt', descending: false)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return const Center(
-              child: Text(
-                "Error loading chat",
-                style: TextStyle(color: Colors.white),
-              ),
-            );
-          }
-
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          final docs = snapshot.data?.docs ?? [];
-
-          if (docs.isEmpty) {
-            return _buildEmptyState(colorScheme);
-          }
-
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (_scrollController.hasClients) {
-              _scrollController.animateTo(
-                _scrollController.position.maxScrollExtent,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOut,
-              );
-            }
-          });
-
-          return ListView.builder(
-            controller: _scrollController,
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            itemCount: docs.length,
-            itemBuilder: (context, index) {
-              final data = docs[index].data() as Map<String, dynamic>;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 24),
-                child: ChatBubble(
-                  text: data["text"] ?? '',
-                  isUser: data["role"] == "user",
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildEmptyState(ColorScheme colorScheme) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            LucideIcons.bot,
-            color: colorScheme.primary.withAlpha(100),
-            size: 48,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            "No messages yet.\nStart a conversation!",
-            textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-              color: colorScheme.onSecondary.withAlpha(150),
-            ),
-          ),
         ],
       ),
     );
@@ -243,9 +158,18 @@ class _AIChatViewState extends State<AIChatView> {
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Row(
           children: [
-            ChatActionChip(label: 'Add to Calendar', onTap: () {}),
-            ChatActionChip(label: 'Set Priority', onTap: () {}),
-            ChatActionChip(label: 'Remind me in 1hr', onTap: () {}),
+            ChatActionChip(
+              label: 'Add Task',
+              onTap: () {
+                _controller.text = "Remind me to ";
+              },
+            ),
+            ChatActionChip(
+              label: 'Summarize',
+              onTap: () {
+                _controller.text = "Can you summarize our conversation?";
+              },
+            ),
           ],
         ),
       ),
