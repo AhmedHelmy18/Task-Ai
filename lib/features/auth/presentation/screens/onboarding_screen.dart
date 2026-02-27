@@ -60,7 +60,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'AI Task Manager',
+                        'Whale Task',
                         style: GoogleFonts.inter(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -102,56 +102,68 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
                 itemCount: _onboardingData.length,
                 itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 40,
-                      vertical: 20,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Spacer(),
-                        Container(
-                          width: 380,
-                          height: 340,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withAlpha(5),
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(
-                              color: Colors.white.withAlpha(10),
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 40,
+                              vertical: 20,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: double.infinity,
+                                  constraints: const BoxConstraints(
+                                    maxWidth: 380,
+                                    maxHeight: 340,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withAlpha(5),
+                                    borderRadius: BorderRadius.circular(24),
+                                    border: Border.all(
+                                      color: Colors.white.withAlpha(10),
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      _onboardingData[index].icon,
+                                      size: 100,
+                                      color: colorScheme.primary,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 48),
+                                Text(
+                                  _onboardingData[index].title,
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  _onboardingData[index].description,
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 16,
+                                    color: colorScheme.onSecondary,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          child: Center(
-                            child: Icon(
-                              _onboardingData[index].icon,
-                              size: 100,
-                              color: colorScheme.primary,
-                            ),
-                          ),
                         ),
-                        const SizedBox(height: 48),
-                        Text(
-                          _onboardingData[index].title,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          _onboardingData[index].description,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            color: colorScheme.onSecondary,
-                            height: 1.5,
-                          ),
-                        ),
-                        const Spacer(),
-                      ],
-                    ),
+                      );
+                    },
                   );
                 },
               ),

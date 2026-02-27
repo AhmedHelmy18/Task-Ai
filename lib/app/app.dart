@@ -9,17 +9,25 @@ import 'package:whale_task/features/auth/presentation/screens/onboarding_screen.
 import 'package:whale_task/features/auth/presentation/screens/verify_email_screen.dart';
 import 'package:whale_task/features/home/presentation/screens/home_screen.dart';
 import 'package:whale_task/features/tasks/presentation/screens/create_task_screen.dart';
+import 'package:whale_task/features/splash/presentation/screens/splash_screen.dart';
 import 'package:whale_task/features/notifications/presentation/screens/notifications_view.dart';
 import 'package:whale_task/features/settings/presentation/screens/settings_view.dart';
 import 'package:whale_task/features/lists/presentation/screens/lists_screen.dart';
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({super.key});
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  bool _showSplash = true;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Whale-task',
+      title: 'Whale Task',
       debugShowCheckedModeBanner: false,
       theme: appTheme.copyWith(
         textTheme: GoogleFonts.interTextTheme(),
@@ -28,21 +36,26 @@ class App extends StatelessWidget {
           selectionHandleColor: appDarkTheme.primary,
         ),
       ),
-      home: BlocBuilder<AuthCubit, AuthState>(
-        builder: (context, state) {
-          if (state is AuthAuthenticated) {
-            return const MainAppShell();
-          } else if (state is AuthNeedsVerification) {
-            return const VerifyEmailScreen();
-          } else if (state is AuthLoading || state is AuthInitial) {
-            return Scaffold(
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              body: const Center(child: CircularProgressIndicator()),
-            );
-          }
-          return const OnboardingScreen();
-        },
-      ),
+      home: _showSplash
+          ? SplashScreen(
+              onFinished: () {
+                setState(() {
+                  _showSplash = false;
+                });
+              },
+            )
+          : BlocBuilder<AuthCubit, AuthState>(
+              builder: (context, state) {
+                if (state is AuthAuthenticated) {
+                  return const MainAppShell();
+                } else if (state is AuthNeedsVerification) {
+                  return const VerifyEmailScreen();
+                } else if (state is AuthLoading || state is AuthInitial) {
+                  return const SplashScreen();
+                }
+                return const OnboardingScreen();
+              },
+            ),
     );
   }
 }
